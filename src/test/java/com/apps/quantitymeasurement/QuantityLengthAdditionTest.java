@@ -58,12 +58,11 @@ class QuantityLengthAdditionTest {
             new QuantityLength(2.54, LengthUnit.CENTIMETERS)
                 .add(new QuantityLength(1.0, LengthUnit.INCHES));
 
-        assertEquals(
-            QuantityLength.convert(2.54, LengthUnit.CENTIMETERS, LengthUnit.CENTIMETERS) +
-            QuantityLength.convert(1.0, LengthUnit.INCHES, LengthUnit.CENTIMETERS),
-            QuantityLength.convert(result.convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS).convertTo(LengthUnit.CENTIMETERS),
-            EPS
-        );
+
+        QuantityLength expected =
+            new QuantityLength(5.08, LengthUnit.CENTIMETERS);
+
+        assertEquals(expected, result);
     }
 
     @Test
