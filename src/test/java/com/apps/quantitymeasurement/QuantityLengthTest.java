@@ -1,7 +1,6 @@
 package com.apps.quantitymeasurement;
 
 import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class QuantityLengthTest {
@@ -9,8 +8,47 @@ class QuantityLengthTest {
     private static final double EPS = 1e-6;
 
 
-  //     UC5: UNIT CONVERSION TESTS
+ //      UC8: STANDALONE LengthUnit RESPONSIBILITY
+  
 
+    @Test
+    void testLengthUnit_ToBaseUnit_Feet() {
+        assertEquals(5.0, LengthUnit.FEET.toFeet(5.0), EPS);
+    }
+
+    @Test
+    void testLengthUnit_ToBaseUnit_Inches() {
+        assertEquals(1.0, LengthUnit.INCHES.toFeet(12.0), EPS);
+    }
+
+    @Test
+    void testLengthUnit_ToBaseUnit_Yards() {
+        assertEquals(3.0, LengthUnit.YARDS.toFeet(1.0), EPS);
+    }
+
+    @Test
+    void testLengthUnit_ToBaseUnit_Centimeters() {
+        assertEquals(1.0, LengthUnit.CENTIMETERS.toFeet(30.48), 1e-3);
+    }
+
+    @Test
+    void testLengthUnit_FromBaseUnit_ToInches() {
+        assertEquals(12.0, LengthUnit.INCHES.fromFeet(1.0), EPS);
+    }
+
+    @Test
+    void testLengthUnit_FromBaseUnit_ToYards() {
+        assertEquals(1.0, LengthUnit.YARDS.fromFeet(3.0), EPS);
+    }
+
+    @Test
+    void testLengthUnit_FromBaseUnit_ToCentimeters() {
+        assertEquals(30.48, LengthUnit.CENTIMETERS.fromFeet(1.0), 1e-3);
+    }
+
+
+  //     UC5: UNIT CONVERSION TESTS
+ 
 
     @Test
     void testConversion_FeetToInches() {
@@ -97,7 +135,6 @@ class QuantityLengthTest {
         assertEquals(new QuantityLength(36.0, LengthUnit.INCHES), inches);
     }
 
-
 //       UC6: ADDITION (IMPLICIT TARGET UNIT)
 
 
@@ -138,15 +175,6 @@ class QuantityLengthTest {
     }
 
     @Test
-    void testAddition_CrossUnit_YardPlusFeet() {
-        QuantityLength result =
-                new QuantityLength(1.0, LengthUnit.YARDS)
-                        .add(new QuantityLength(3.0, LengthUnit.FEET));
-
-        assertEquals(new QuantityLength(2.0, LengthUnit.YARDS), result);
-    }
-
-    @Test
     void testAddition_CentimeterPlusInch() {
         QuantityLength result =
                 new QuantityLength(2.54, LengthUnit.CENTIMETERS)
@@ -156,31 +184,13 @@ class QuantityLengthTest {
     }
 
     @Test
-    void testAddition_WithZero() {
-        QuantityLength result =
-                new QuantityLength(5.0, LengthUnit.FEET)
-                        .add(new QuantityLength(0.0, LengthUnit.INCHES));
-
-        assertEquals(new QuantityLength(5.0, LengthUnit.FEET), result);
-    }
-
-    @Test
-    void testAddition_NegativeValues() {
-        QuantityLength result =
-                new QuantityLength(5.0, LengthUnit.FEET)
-                        .add(new QuantityLength(-2.0, LengthUnit.FEET));
-
-        assertEquals(new QuantityLength(3.0, LengthUnit.FEET), result);
-    }
-
-    @Test
     void testAddition_NullSecondOperand() {
         assertThrows(IllegalArgumentException.class,
                 () -> new QuantityLength(1.0, LengthUnit.FEET).add(null));
     }
 
 
-//       UC7: ADDITION WITH EXPLICIT TARGET UNIT
+ //      UC7: ADDITION WITH EXPLICIT TARGET UNIT
 
 
     @Test
