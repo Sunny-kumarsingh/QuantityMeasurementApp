@@ -47,6 +47,28 @@ public final class QuantityLength {
         double converted = convert(this.value, this.unit, target);
         return new QuantityLength(converted, target);
     }
+    
+    
+    /* ================= UC6: ADDITION ================= */
+
+    
+    public static QuantityLength add(QuantityLength a,
+                                     QuantityLength b) {
+        if (a == null || b == null) {
+            throw new IllegalArgumentException("Operands cannot be null");
+        }
+
+        double sumFeet = a.toBaseFeet() + b.toBaseFeet();
+        double resultValue = a.unit.fromFeet(sumFeet);
+
+        return new QuantityLength(resultValue, a.unit);
+    }
+
+    
+    public QuantityLength add(QuantityLength other) {
+        return add(this, other);
+    }
+
 
     /* ================= Equality (UC3/UC4) ================= */
 
