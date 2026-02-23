@@ -34,8 +34,8 @@ public class QuantityLengthTest {
     @Test
     void testEquality_InchToInch_DifferentValue() {
         assertNotEquals(
-                new QuantityLength(1.0, LengthUnit.INCH),
-                new QuantityLength(2.0, LengthUnit.INCH)
+                new QuantityLength(1.0, LengthUnit.INCHES),
+                new QuantityLength(2.0, LengthUnit.INCHES)
         );
     }
 
@@ -44,14 +44,14 @@ public class QuantityLengthTest {
     void testEquality_FeetToInch_EquivalentValue() {
         assertEquals(
                 new QuantityLength(1.0, LengthUnit.FEET),
-                new QuantityLength(12.0, LengthUnit.INCH)
+                new QuantityLength(12.0, LengthUnit.INCHES)
         );
     }
 
     @Test
     void testEquality_InchToFeet_EquivalentValue() {
         assertEquals(
-                new QuantityLength(12.0, LengthUnit.INCH),
+                new QuantityLength(12.0, LengthUnit.INCHES),
                 new QuantityLength(1.0, LengthUnit.FEET)
         );
     }
