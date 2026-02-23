@@ -2,24 +2,29 @@ package com.apps.quantitymeasurement;
 
 public class QuantityMeasurementApp {
 
+    // Overloaded demo methods
+    public static void demonstrateLengthConversion(double value,
+                                                    LengthUnit from,
+                                                    LengthUnit to) {
+        double result = QuantityLength.convert(value, from, to);
+        System.out.println("convert(" + value + ", " + from + ", " + to + ") → " + result);
+    }
+
+    public static void demonstrateLengthConversion(QuantityLength length,
+                                                    LengthUnit to) {
+        QuantityLength converted = length.convertTo(to);
+        System.out.println(length + " → " + converted);
+    }
+
     public static void main(String[] args) {
 
-        // UC1: Feet to Feet
-        QuantityLength feet1 = new QuantityLength(1.0, LengthUnit.FEET);
-        QuantityLength feet2 = new QuantityLength(1.0, LengthUnit.FEET);
-        System.out.println("Input: 1.0 ft and 1.0 ft");
-        System.out.println("Output: Equal (" + feet1.equals(feet2) + ")");
+        demonstrateLengthConversion(1.0, LengthUnit.FEET, LengthUnit.INCHES);     // 12.0
+        demonstrateLengthConversion(3.0, LengthUnit.YARDS, LengthUnit.FEET);      // 9.0
+        demonstrateLengthConversion(36.0, LengthUnit.INCHES, LengthUnit.YARDS);   // 1.0
+        demonstrateLengthConversion(1.0, LengthUnit.CENTIMETERS, LengthUnit.INCHES);
+        demonstrateLengthConversion(0.0, LengthUnit.FEET, LengthUnit.INCHES);
 
-        // UC2: Inch to Inch
-        QuantityLength inch1 = new QuantityLength(1.0, LengthUnit.INCH);
-        QuantityLength inch2 = new QuantityLength(1.0, LengthUnit.INCH);
-        System.out.println("Input: 1.0 inch and 1.0 inch");
-        System.out.println("Output: Equal (" + inch1.equals(inch2) + ")");
-
-        // UC3: Cross-unit comparison
-        QuantityLength feet = new QuantityLength(1.0, LengthUnit.FEET);
-        QuantityLength inches = new QuantityLength(12.0, LengthUnit.INCH);
-        System.out.println("Input: 1.0 ft and 12.0 inch");
-        System.out.println("Output: Equal (" + feet.equals(inches) + ")");
+        QuantityLength q = new QuantityLength(2.0, LengthUnit.YARDS);
+        demonstrateLengthConversion(q, LengthUnit.INCHES);
     }
 }
