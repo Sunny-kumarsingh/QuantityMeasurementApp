@@ -17,8 +17,8 @@ public class QuantityLengthTest {
     @Test
     void testEquality_InchToInch_SameValue() {
         assertEquals(
-                new QuantityLength(1.0, LengthUnit.INCH),
-                new QuantityLength(1.0, LengthUnit.INCH)
+                new QuantityLength(1.0, LengthUnit.INCHES),
+                new QuantityLength(1.0, LengthUnit.INCHES)
         );
     }
 
@@ -69,7 +69,7 @@ public class QuantityLengthTest {
     void testEquality_YardToInches() {
         assertEquals(
                 new QuantityLength(1.0, LengthUnit.YARDS),
-                new QuantityLength(36.0, LengthUnit.INCH)
+                new QuantityLength(36.0, LengthUnit.INCHES)
         );
     }
 
@@ -77,7 +77,7 @@ public class QuantityLengthTest {
     void testEquality_CentimeterToInch() {
         assertEquals(
                 new QuantityLength(1.0, LengthUnit.CENTIMETERS),
-                new QuantityLength(0.393701, LengthUnit.INCH)
+                new QuantityLength(0.393701, LengthUnit.INCHES)
         );
     }
 
@@ -85,7 +85,7 @@ public class QuantityLengthTest {
     void testEquality_TransitiveProperty() {
         QuantityLength yard = new QuantityLength(1.0, LengthUnit.YARDS);
         QuantityLength feet = new QuantityLength(3.0, LengthUnit.FEET);
-        QuantityLength inch = new QuantityLength(36.0, LengthUnit.INCH);
+        QuantityLength inch = new QuantityLength(36.0, LengthUnit.INCHES);
 
         assertEquals(yard, feet);
         assertEquals(feet, inch);
@@ -114,7 +114,7 @@ public class QuantityLengthTest {
     @Test
     void testHashCode_Consistency() {
         QuantityLength q1 = new QuantityLength(1.0, LengthUnit.YARDS);
-        QuantityLength q2 = new QuantityLength(36.0, LengthUnit.INCH);
+        QuantityLength q2 = new QuantityLength(36.0, LengthUnit.INCHES);
 
         assertEquals(q1, q2);
         assertEquals(q1.hashCode(), q2.hashCode());
