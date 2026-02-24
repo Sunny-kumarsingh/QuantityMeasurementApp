@@ -57,7 +57,7 @@ class QuantityWeightTest {
             new QuantityWeight(2.20462, WeightUnit.POUND)
                 .convertTo(WeightUnit.KILOGRAM);
 
-        assertEquals(1.0, kg.convertTo(WeightUnit.KILOGRAM).toString().contains("1.0") ? 1.0 : kg.convertTo(WeightUnit.KILOGRAM).toString(), EPS);
+        assertEquals(1.0, kg.getValue(), EPS);
     }
 
     /* ================= Addition ================= */
