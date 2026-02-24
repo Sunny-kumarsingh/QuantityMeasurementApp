@@ -1,9 +1,6 @@
 package com.apps.quantitymeasurement;
 
-/**
- * Supported weight units with conversion responsibility.
- * Base unit: KILOGRAM
- */
+
 public enum WeightUnit {
 
     KILOGRAM(1.0),
