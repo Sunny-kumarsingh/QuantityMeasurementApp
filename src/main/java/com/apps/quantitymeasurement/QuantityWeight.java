@@ -15,6 +15,14 @@ public final class QuantityWeight {
         this.value = value;
         this.unit = unit;
     }
+    
+    public double getValue() {
+        return value;
+    }
+
+    public WeightUnit getUnit() {
+        return unit;
+    }
 
     /* ================= Validation ================= */
 
