@@ -4,72 +4,27 @@ public class QuantityMeasurementApp {
 
     public static void main(String[] args) {
 
-        System.out.println(
-            QuantityLength.add(
-                new QuantityLength(1.0, LengthUnit.FEET),
-                new QuantityLength(12.0, LengthUnit.INCHES),
-                LengthUnit.FEET
-            )
-        );
+        // ===== Length =====
+        Quantity<LengthUnit> l1 =
+                new Quantity<>(1.0, LengthUnit.FEET);
+        Quantity<LengthUnit> l2 =
+                new Quantity<>(12.0, LengthUnit.INCHES);
 
-        System.out.println(
-            QuantityLength.add(
-                new QuantityLength(1.0, LengthUnit.FEET),
-                new QuantityLength(12.0, LengthUnit.INCHES),
-                LengthUnit.INCHES
-            )
-        );
+        System.out.println(l1.equals(l2)); 
+        System.out.println(l1.convertTo(LengthUnit.INCHES));
+        System.out.println(l1.add(l2, LengthUnit.FEET));
 
-        System.out.println(
-            QuantityLength.add(
-                new QuantityLength(1.0, LengthUnit.FEET),
-                new QuantityLength(12.0, LengthUnit.INCHES),
-                LengthUnit.YARDS
-            )
-        );
+        // ===== Weight =====
+        Quantity<WeightUnit> w1 =
+                new Quantity<>(1.0, WeightUnit.KILOGRAM);
+        Quantity<WeightUnit> w2 =
+                new Quantity<>(1000.0, WeightUnit.GRAM);
 
-        System.out.println(
-            QuantityLength.add(
-                new QuantityLength(36.0, LengthUnit.INCHES),
-                new QuantityLength(1.0, LengthUnit.YARDS),
-                LengthUnit.FEET
-            )
-        );
+        System.out.println(w1.equals(w2)); // true
+        System.out.println(w1.convertTo(WeightUnit.GRAM));
+        System.out.println(w1.add(w2, WeightUnit.KILOGRAM));
 
-        System.out.println(
-            QuantityLength.add(
-                new QuantityLength(2.54, LengthUnit.CENTIMETERS),
-                new QuantityLength(1.0, LengthUnit.INCHES),
-                LengthUnit.CENTIMETERS
-            )
-        );
-        
-     // == UC8 ==
-
-        // Convert TO base unit (feet)
-        System.out.println("UC8: INCHES -> FEET = "
-                + LengthUnit.INCHES.toFeet(12.0));
-
-        System.out.println("UC8: YARDS -> FEET = "
-                + LengthUnit.YARDS.toFeet(1.0));
-
-        // Convert FROM base unit (feet)
-        System.out.println("UC8: FEET -> INCHES = "
-                + LengthUnit.INCHES.fromFeet(1.0));
-
-        System.out.println("UC8: FEET -> CENTIMETERS = "
-                + LengthUnit.CENTIMETERS.fromFeet(1.0));
-
-        // QuantityLength delegates conversion to LengthUnit
-        System.out.println(
-            new QuantityLength(1.0, LengthUnit.FEET)
-                .convertTo(LengthUnit.INCHES)
-        );
-
-        // Equality using delegated conversion
-        System.out.println(
-            new QuantityLength(36.0, LengthUnit.INCHES)
-                .equals(new QuantityLength(1.0, LengthUnit.YARDS))
-        );
+        // ===== Cross-category =====
+        System.out.println(l1.equals(w1));
     }
 }
