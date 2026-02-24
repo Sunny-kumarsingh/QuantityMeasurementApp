@@ -1,29 +1,26 @@
 package com.apps.quantitymeasurement;
 
-/**
- * Supported length units with conversion factors relative to FEET (base unit).
- */
-public enum LengthUnit {
+
+public enum LengthUnit implements IMeasurable {
 
     FEET(1.0),
     INCHES(1.0 / 12.0),
     YARDS(3.0),
     CENTIMETERS(0.393701 / 12.0);
 
-    private final double toFeetFactor;
+    private final double factor;
 
-    LengthUnit(double toFeetFactor) {
-        this.toFeetFactor = toFeetFactor;
+    LengthUnit(double factor) {
+        this.factor = factor;
     }
 
-    public double toFeet(double value) {
-        return value * toFeetFactor;
-    }
-
-    public double fromFeet(double feetValue) {
-        return feetValue / toFeetFactor;
-    }
+    @Override
     public double getConversionFactor() {
-        return toFeetFactor;
+        return factor;
+    }
+
+    @Override
+    public String getUnitName() {
+        return name();
     }
 }
