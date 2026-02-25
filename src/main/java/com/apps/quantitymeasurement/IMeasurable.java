@@ -1,19 +1,11 @@
 package com.apps.quantitymeasurement;
-
-/**
- * Common contract for all measurable units.
- */
 public interface IMeasurable {
 
-    double getConversionFactor();          // factor relative to base unit
+    double getConversionFactor();
 
-    default double convertToBaseUnit(double value) {
-        return value * getConversionFactor();
-    }
+    double convertToBaseUnit(double value);
 
-    default double convertFromBaseUnit(double baseValue) {
-        return baseValue / getConversionFactor();
-    }
+    double convertFromBaseUnit(double baseValue);
 
     String getUnitName();
 }
