@@ -95,4 +95,3 @@ Architecture now supports **multi-category measurement systems** without refacto
 
 ---
 
-**Code Link:** [UC-8 feature](https://github.com/Saud0786/QuantityMeasurementApp/tree/feature/UC8-StandaloneUnit/src)
