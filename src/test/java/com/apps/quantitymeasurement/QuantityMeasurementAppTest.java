@@ -1,6 +1,14 @@
 package com.apps.quantitymeasurement;
 
 import org.junit.jupiter.api.Test;
+
+
+import com.apps.quantitymeasurement.core.LengthUnit;
+import com.apps.quantitymeasurement.core.Quantity;
+import com.apps.quantitymeasurement.core.TemperatureUnit;
+import com.apps.quantitymeasurement.core.VolumeUnit;
+import com.apps.quantitymeasurement.core.WeightUnit;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class QuantityMeasurementAppTest {
@@ -738,7 +746,7 @@ public class QuantityMeasurementAppTest {
         double result = new Quantity<>(1.0, WeightUnit.KILOGRAM)
                 .divide(new Quantity<>(1_000_000.0, WeightUnit.KILOGRAM));
         assertEquals(1e-6, result, 1e-9);
-    }
+    }  
 
     @Test
     void testDivision_NullOperand() {
@@ -752,5 +760,121 @@ public class QuantityMeasurementAppTest {
         Quantity<WeightUnit> q2 = new Quantity<>(5.0, WeightUnit.KILOGRAM);
 
         assertThrows(IllegalArgumentException.class, () -> q1.divide((Quantity) q2));
+    }
+    
+    // UC14 - Temperature test cases
+    // Temperature Equality Test Cases
+    
+    @Test
+    void testTemperatureEquality_CelsiusToCelsius() {
+        Quantity<TemperatureUnit> t1 = new Quantity<>(0.0, TemperatureUnit.CELSIUS);
+        Quantity<TemperatureUnit> t2 = new Quantity<>(0.0, TemperatureUnit.CELSIUS);
+
+        assertEquals(t1, t2);
+    }
+
+    @Test
+    void testTemperatureEquality_CelsiusToFahrenheit() {
+        Quantity<TemperatureUnit> t1 = new Quantity<>(0.0, TemperatureUnit.CELSIUS);
+        Quantity<TemperatureUnit> t2 = new Quantity<>(32.0, TemperatureUnit.FAHRENHEIT);
+
+        assertEquals(t1, t2);
+    }
+
+    @Test
+    void testTemperatureEquality_FahrenheitToCelsius() {
+        Quantity<TemperatureUnit> t1 = new Quantity<>(212.0, TemperatureUnit.FAHRENHEIT);
+        Quantity<TemperatureUnit> t2 = new Quantity<>(100.0, TemperatureUnit.CELSIUS);
+
+        assertEquals(t1, t2);
+    }
+
+    @Test
+    void testTemperatureEquality_KelvinToCelsius() {
+        Quantity<TemperatureUnit> t1 = new Quantity<>(273.15, TemperatureUnit.KELVIN);
+        Quantity<TemperatureUnit> t2 = new Quantity<>(0.0, TemperatureUnit.CELSIUS);
+
+        assertEquals(t1, t2);
+    }
+
+    @Test
+    void testTemperatureInequality() {
+        Quantity<TemperatureUnit> t1 = new Quantity<>(0.0, TemperatureUnit.CELSIUS);
+        Quantity<TemperatureUnit> t2 = new Quantity<>(10.0, TemperatureUnit.CELSIUS);
+
+        assertNotEquals(t1, t2);
+    }
+    
+    // Temperature Conversion Test Cases
+    
+    @Test
+    void testTemperatureConversion_CelsiusToFahrenheit() {
+        Quantity<TemperatureUnit> t = new Quantity<>(100.0, TemperatureUnit.CELSIUS);
+        Quantity<TemperatureUnit> result = t.convertTo(TemperatureUnit.FAHRENHEIT);
+
+        assertEquals(212.0, result.getValue(), 0.01);
+    }
+
+    @Test
+    void testTemperatureConversion_FahrenheitToCelsius() {
+        Quantity<TemperatureUnit> t = new Quantity<>(32.0, TemperatureUnit.FAHRENHEIT);
+        Quantity<TemperatureUnit> result = t.convertTo(TemperatureUnit.CELSIUS);
+
+        assertEquals(0.0, result.getValue(), 0.01);
+    }
+
+    @Test
+    void testTemperatureConversion_CelsiusToKelvin() {
+        Quantity<TemperatureUnit> t = new Quantity<>(0.0, TemperatureUnit.CELSIUS);
+        Quantity<TemperatureUnit> result = t.convertTo(TemperatureUnit.KELVIN);
+
+        assertEquals(273.15, result.getValue(), 0.01);
+    }
+
+    @Test
+    void testTemperatureConversion_KelvinToCelsius() {
+        Quantity<TemperatureUnit> t = new Quantity<>(273.15, TemperatureUnit.KELVIN);
+        Quantity<TemperatureUnit> result = t.convertTo(TemperatureUnit.CELSIUS);
+
+        assertEquals(0.0, result.getValue(), 0.01);
+    }
+
+    @Test
+    void testTemperatureConversion_SameUnit() {
+        Quantity<TemperatureUnit> t = new Quantity<>(25.0, TemperatureUnit.CELSIUS);
+        Quantity<TemperatureUnit> result = t.convertTo(TemperatureUnit.CELSIUS);
+
+        assertEquals(25.0, result.getValue(), 0.01);
+    }
+
+    
+    
+    // Cross-Category Safety Tests
+
+    @Test
+    void testTemperatureVsWeight_NotEqual() {
+        Quantity<TemperatureUnit> t = new Quantity<>(100.0, TemperatureUnit.CELSIUS);
+        Quantity<WeightUnit> w = new Quantity<>(100.0, WeightUnit.KILOGRAM);
+
+        assertNotEquals(t, w);
+    }
+
+    
+    // Edge Case Tests
+    
+    @Test
+    void testTemperatureNegative40_CelsiusEqualsFahrenheit() {
+        Quantity<TemperatureUnit> t1 = new Quantity<>(-40.0, TemperatureUnit.CELSIUS);
+        Quantity<TemperatureUnit> t2 = new Quantity<>(-40.0, TemperatureUnit.FAHRENHEIT);
+
+        assertEquals(t1, t2);
+    }
+
+    @Test
+    void testTemperatureAbsoluteZero() {
+        Quantity<TemperatureUnit> t1 = new Quantity<>(-273.15, TemperatureUnit.CELSIUS);
+        Quantity<TemperatureUnit> t2 = new Quantity<>(0.0, TemperatureUnit.KELVIN);
+
+        assertEquals(t1, t2);
     }
 }
