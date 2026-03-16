@@ -1,9 +1,15 @@
 package com.apps.quantitymeasurement.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.apps.quantitymeasurement.model.QuantityDTO;
 import com.apps.quantitymeasurement.service.IQuantityMeasurementService;
 
+
 public class QuantityMeasurementController {
+	
+	  private static final Logger logger =
+	            LoggerFactory.getLogger(QuantityMeasurementController.class);
 
     private final IQuantityMeasurementService service;
 

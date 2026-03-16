@@ -3,8 +3,15 @@ package com.apps.quantitymeasurement.service;
 import com.apps.quantitymeasurement.core.*;
 import com.apps.quantitymeasurement.model.*;
 import com.apps.quantitymeasurement.repository.IQuantityMeasurementRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class QuantityMeasurementServiceImpl implements IQuantityMeasurementService {
+	
+	private static final Logger logger =
+            LoggerFactory.getLogger(QuantityMeasurementServiceImpl.class);
+
 
     private final IQuantityMeasurementRepository repository;
 

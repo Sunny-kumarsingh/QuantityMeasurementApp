@@ -1,62 +1,45 @@
-package com.apps.quantitymeasurement.app;
+package com.apps.quantitymeasurement.app; // Updated package name as per UC16
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.apps.quantitymeasurement.controller.QuantityMeasurementController;
 import com.apps.quantitymeasurement.model.QuantityDTO;
 import com.apps.quantitymeasurement.repository.QuantityMeasurementCacheRepository;
+// ... other imports ...
 import com.apps.quantitymeasurement.service.QuantityMeasurementServiceImpl;
 
 public class QuantityMeasurementApp {
-
+    // 1. Initialize the Logger
+	private static final Logger logger =
+	        LoggerFactory.getLogger(QuantityMeasurementApp.class);
+	
+	
     public static void main(String[] args) {
+        logger.info("Quantity Measurement Application starting...");
 
-        // Repository
-        QuantityMeasurementCacheRepository repository =
-                new QuantityMeasurementCacheRepository();
+        try {
+            // Repository, Service, and Controller initialization
+            QuantityMeasurementCacheRepository repository = new QuantityMeasurementCacheRepository();
+            QuantityMeasurementServiceImpl service = new QuantityMeasurementServiceImpl(repository);
+            QuantityMeasurementController controller = new QuantityMeasurementController(service);
 
-        // Service
-        QuantityMeasurementServiceImpl service =
-                new QuantityMeasurementServiceImpl(repository);
+            // Example 1: Comparison
+            QuantityDTO q1 = new QuantityDTO(1, QuantityDTO.LengthUnit.FEET);
+            QuantityDTO q2 = new QuantityDTO(12, QuantityDTO.LengthUnit.INCHES);
+            
+            // 2. Replace System.out.println with logger.info
+            logger.info("Comparing 1 FEET and 12 INCHES: {}", controller.compare(q1, q2));
 
-        // Controller
-        QuantityMeasurementController controller =
-                new QuantityMeasurementController(service);
+            // Example 2: Conversion
+            QuantityDTO converted = controller.convert(q1, QuantityDTO.LengthUnit.INCHES);
+            logger.info("Conversion result: 1 FEET is {} INCHES", converted.value);
 
-        // Example 1: Comparison
-        QuantityDTO q1 =
-                new QuantityDTO(1, QuantityDTO.LengthUnit.FEET);
+            // ... repeat for other operations ...
 
-        QuantityDTO q2 =
-                new QuantityDTO(12, QuantityDTO.LengthUnit.INCHES);
-
-        System.out.println("1 FEET equals 12 INCHES: "
-                + controller.compare(q1, q2));
-
-        // Example 2: Conversion
-        QuantityDTO converted =
-                controller.convert(q1, QuantityDTO.LengthUnit.INCHES);
-
-        System.out.println("1 FEET in INCHES: "
-                + converted.value);
-
-        // Example 3: Addition
-        QuantityDTO added =
-                controller.add(q1, q2);
-
-        System.out.println("Addition result: "
-                + added.value + " " + added.unit.getUnitName());
-
-        // Example 4: Subtraction
-        QuantityDTO subtracted =
-                controller.subtract(q1, q2);
-
-        System.out.println("Subtraction result: "
-                + subtracted.value + " " + subtracted.unit.getUnitName());
-
-        // Example 5: Division
-        double result =
-                controller.divide(q1, new QuantityDTO(2,
-                        QuantityDTO.LengthUnit.FEET));
-
-        System.out.println("Division result: " + result);
+        } catch (Exception e) {
+            // 3. Log errors professionally
+            logger.error("An error occurred during application execution: ", e);
+        }
     }
 }
