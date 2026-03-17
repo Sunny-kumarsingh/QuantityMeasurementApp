@@ -1,181 +1,89 @@
 package com.app.quantitymeasurement.service;
 
-import java.util.List;
-import java.util.Objects;
-
 import com.app.quantitymeasurement.entity.QuantityDTO;
-import com.app.quantitymeasurement.model.Quantity;
-import com.app.quantitymeasurement.model.QuantityMeasurementEntity;
-import com.app.quantitymeasurement.model.QuantityModel;
 import com.app.quantitymeasurement.repository.IQuantityMeasurementRepository;
 import com.app.quantitymeasurement.unit.IMeasurable;
-import com.app.quantitymeasurement.unit.LengthUnit;
-import com.app.quantitymeasurement.unit.Temperature;
-import com.app.quantitymeasurement.unit.VolumneUnit;
-import com.app.quantitymeasurement.unit.WeightUnit;
+import com.app.quantitymeasurement.unit.Quantity;
 
+public class QuantityMeasurementServiceImpl implements IQuantityMeasurementService {
 
+	@SuppressWarnings("unused")
+	private final IQuantityMeasurementRepository repository;
 
-public class QuantityMeasurementServiceImpl implements IQuantityMeasurementService{
-
-	private IQuantityMeasurementRepository repository;
-	
 	public QuantityMeasurementServiceImpl(IQuantityMeasurementRepository repository) {
 		this.repository = repository;
 	}
-	
-	private enum Operation{
-		COMPARISION,CONVERSION,ARITHMETIC;
+
+	@Override
+	public boolean compare(QuantityDTO q1, QuantityDTO q2) {
+
+		Quantity<?> quantity1 = convertToQuantity(q1);
+		Quantity<?> quantity2 = convertToQuantity(q2);
+
+		return quantity1.equals(quantity2);
+	}
+
+	private Quantity<?> convertToQuantity(QuantityDTO dto) {
+
+		IMeasurable unit = IMeasurable.fromUnitName(dto.getMeasurementType(), dto.getUnit());
+
+		return new Quantity<>(dto.getValue(), unit);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public QuantityDTO convert(QuantityDTO q, String targetUnit) {
+
+	    Quantity<IMeasurable> quantity =
+	            (Quantity<IMeasurable>) convertToQuantity(q);
+
+	    IMeasurable target =
+	            IMeasurable.fromUnitName(q.getMeasurementType(), targetUnit);
+
+	    Quantity<IMeasurable> result = quantity.convertTo(target);
+
+	    return new QuantityDTO(
+	            result.getValue(),
+	            result.getUnit().getUnitName(),
+	            q.getMeasurementType()
+	    );
 	}
 	@Override
-	public boolean compare(QuantityDTO thisQuantityDTO, QuantityDTO thatQuantityDTO) {
-		 QuantityModel<?> q1 = getQuantityInstance(thisQuantityDTO);
-		 QuantityModel<?> q2 = getQuantityInstance(thatQuantityDTO);
-		 validateArithmeticOperation(q1, q2);
-		 Quantity<IMeasurable> q3 = new Quantity<IMeasurable>(q1.getValue(),q1.getUnit());
-		 Quantity<IMeasurable> q4 = new Quantity<IMeasurable>(q2.getValue(),q2.getUnit());
-		 
-		 boolean result = q3.compare(q4);
-		 repository.save(new QuantityMeasurementEntity(thisQuantityDTO,thatQuantityDTO,Operation.COMPARISION.toString(),result?"EQUAL":"NOT EQUAL"));
-		 return result;
+	public QuantityDTO add(QuantityDTO q1, QuantityDTO q2) {
+
+	    Quantity<?> quantity1 = convertToQuantity(q1);
+	    Quantity<?> quantity2 = convertToQuantity(q2);
+
+	    Quantity<?> result = quantity1.add(quantity2);
+
+	    return new QuantityDTO(
+	            result.getValue(),
+	            result.getUnit().getUnitName(),
+	            q1.getMeasurementType()
+	    );
 	}
 
 	@Override
-	public QuantityDTO convert(QuantityDTO thisQuantityDTO, QuantityDTO thatQuantityDTO) {
-		QuantityModel<?> q1 = getQuantityInstance(thisQuantityDTO);
-		QuantityModel<?> q2 = getQuantityInstance(thatQuantityDTO);
-		validateArithmeticOperation(q1, q2);
-		Quantity<IMeasurable> q3 = new Quantity<IMeasurable>(q1.getValue(),q1.getUnit());
-		Quantity<IMeasurable> q4 = new Quantity<IMeasurable>(q2.getValue(), q2.getUnit());
-		q4 = q3.convertTo(q4);
-		
-		QuantityDTO q5 = new QuantityDTO(q4.getValue(), q1.getUnit().getUnitName(),q1.getUnit().getClass().getSimpleName());
-		repository.save(new QuantityMeasurementEntity(thisQuantityDTO, thatQuantityDTO, Operation.CONVERSION.toString(),q5));
-		
-		return q5;
+	public QuantityDTO subtract(QuantityDTO q1, QuantityDTO q2) {
+
+	    Quantity<?> quantity1 = convertToQuantity(q1);
+	    Quantity<?> quantity2 = convertToQuantity(q2);
+
+	    Quantity<?> result = quantity1.subtract(quantity2);
+
+	    return new QuantityDTO(
+	            result.getValue(),
+	            result.getUnit().getUnitName(),
+	            q1.getMeasurementType()
+	    );
 	}
 
 	@Override
-	public QuantityDTO add(QuantityDTO thisQuantityDTO, QuantityDTO thatQuantityDTO) {
-		
-		QuantityModel<?> q1 =getQuantityInstance(thisQuantityDTO);
-		QuantityModel<?> q2 = getQuantityInstance(thatQuantityDTO);
-		validateArithmeticOperation(q1, q2);
-		Quantity<IMeasurable> q3 = new Quantity<IMeasurable>(q1.getValue(),q1.getUnit());
-		Quantity<IMeasurable> q4 = new Quantity<IMeasurable>(q2.getValue(), q2.getUnit());
-		
-		q4 = q3.add(q4);
-		
-		QuantityDTO q5 =  new QuantityDTO(q4.getValue(),q3.getUnit().getUnitName(),q3.getUnit().getClass().getSimpleName());
-	    repository.save(new QuantityMeasurementEntity(thisQuantityDTO, thatQuantityDTO, Operation.ARITHMETIC.toString(),q5));
-		
-	    return q5;
-	}
+	public double divide(QuantityDTO q1, QuantityDTO q2) {
 
-	@Override
-	public QuantityDTO add(QuantityDTO thisQuantityDTO, QuantityDTO thatQuantityDTO, QuantityDTO targetQuantityDTO) {
-		QuantityModel<?> q1 = getQuantityInstance(thisQuantityDTO);
-		QuantityModel<?> q2 = getQuantityInstance(thatQuantityDTO);
-		QuantityModel<?> q3 = getQuantityInstance(targetQuantityDTO);
-		validateArithmeticOperation(q1, q2);
-		validateArithmeticOperation(q2, q3);
-		Quantity<IMeasurable> q4 = new Quantity<IMeasurable>(q1.getValue(),q1.getUnit());
-		Quantity<IMeasurable> q5 = new Quantity<IMeasurable>(q2.getValue(), q2.getUnit());
-		
-		q5 = q4.add(q5,q3.getUnit());
-		QuantityDTO q6 = new QuantityDTO(q5.getValue(),q5.getUnit().getUnitName(),q5.getUnit().getClass().getSimpleName());
-		
-		repository.save(new QuantityMeasurementEntity(thisQuantityDTO, thatQuantityDTO,Operation.ARITHMETIC.toString(),q6));
-		
-		return q6;
-	}
+	    Quantity<?> quantity1 = convertToQuantity(q1);
+	    Quantity<?> quantity2 = convertToQuantity(q2);
 
-	@Override
-	public QuantityDTO subtract(QuantityDTO thisQuantityDTO, QuantityDTO thatQuantityDTO) {
-		QuantityModel<?> q1 = getQuantityInstance(thisQuantityDTO);
-		QuantityModel<?> q2 = getQuantityInstance(thatQuantityDTO);
-		validateArithmeticOperation(q1, q2);
-		Quantity<IMeasurable> q3 = new Quantity<IMeasurable>(q1.getValue(),q1.getUnit());
-		Quantity<IMeasurable> q4 = new Quantity<IMeasurable>(q2.getValue(), q2.getUnit());
-		
-		q4=q3.subtract(q4);
-		
-		QuantityDTO q5 = new QuantityDTO(q4.getValue(),q4.getUnit().getUnitName(),q4.getUnit().getClass().getSimpleName());
-		repository.save(new QuantityMeasurementEntity(thisQuantityDTO, thatQuantityDTO, Operation.ARITHMETIC.toString(),q5));
-		
-		return q5;
+	    return quantity1.divide(quantity2);
 	}
-
-	@Override
-	public QuantityDTO subtract(QuantityDTO thisQuantityDTO, QuantityDTO thatQuantityDTO, QuantityDTO targetQuantityDTO) {
-		QuantityModel<?> q1 = getQuantityInstance(thisQuantityDTO);
-		QuantityModel<?> q2 = getQuantityInstance(thatQuantityDTO);
-		QuantityModel<?> q3 = getQuantityInstance(targetQuantityDTO);
-		validateArithmeticOperation(q1, q2);
-		validateArithmeticOperation(q2, q3);
-		Quantity<IMeasurable> q4 = new Quantity<IMeasurable>(q1.getValue(),q1.getUnit());
-		Quantity<IMeasurable> q5 = new Quantity<IMeasurable>(q2.getValue(), q2.getUnit());
-		q5 = q4.subtract(q5,q3.getUnit());
-		
-		QuantityDTO q6 = new QuantityDTO(q5.getValue(),q5.getUnit().getUnitName(),q5.getUnit().getClass().getSimpleName());
-		
-		repository.save(new QuantityMeasurementEntity(thisQuantityDTO, thatQuantityDTO,Operation.ARITHMETIC.toString(),q6));
-		return q6;
-	}
-
-	@Override
-	public QuantityDTO divide(QuantityDTO thisQuantityDTO, QuantityDTO thatQuantityDTO) {
-		QuantityModel<?> q1 = getQuantityInstance(thisQuantityDTO);
-		QuantityModel<?> q2 = getQuantityInstance(thatQuantityDTO);
-		validateArithmeticOperation(q1, q2);
-		Quantity<IMeasurable> q3 = new Quantity<IMeasurable>(q1.getValue(), q1.getUnit());
-		Quantity<IMeasurable> q4 = new Quantity<IMeasurable>(q2.getValue(),q2.getUnit());
-		
-		q3 = q3.division(q4);
-		QuantityDTO q5 = new QuantityDTO(q3.getValue(),q3.getUnit().getUnitName(),q3.getUnit().getClass().getSimpleName());
-		
-		repository.save(new QuantityMeasurementEntity(thisQuantityDTO, thatQuantityDTO, Operation.ARITHMETIC.toString(),q5));
-		return q5;
-	}
-
-	@Override
-	public QuantityDTO divide(QuantityDTO thisQuantityDTO, QuantityDTO thatQuantityDTO, QuantityDTO targetQuantityDTO) {
-		 QuantityModel<?> q1 = getQuantityInstance(thisQuantityDTO);
-		 QuantityModel<?> q2 = getQuantityInstance(thatQuantityDTO);
-		 QuantityModel<?> q3 = getQuantityInstance(targetQuantityDTO);
-		 validateArithmeticOperation(q1, q2);
-		 validateArithmeticOperation(q2, q3);
-		 Quantity<IMeasurable> q4 = new Quantity<IMeasurable>(q1.getValue(),q1.getUnit());
-		 Quantity<IMeasurable> q5 = new Quantity<IMeasurable>(q2.getValue(), q2.getUnit());
-		 
-		 q4 = q4.division(q5,q3.getUnit());
-		 
-		 QuantityDTO q6 = new QuantityDTO(q4.getValue(),q4.getUnit().getUnitName(),q4.getUnit().getClass().getSimpleName());
-		 
-		 repository.save(new QuantityMeasurementEntity(thisQuantityDTO, thatQuantityDTO,Operation.ARITHMETIC.toString(),q6));
-		 
-		 return q6;
-	}
-    private QuantityModel<?> getQuantityInstance(QuantityDTO dto){
-    	switch(dto.getMeasurementType()) {
-    	case "VOLUME":
-    		return new QuantityModel<>(dto.getValue(),VolumneUnit.valueOf(dto.getUnit()));
-    	case "WEIGHT":
-    		return new QuantityModel<>(dto.getValue(),WeightUnit.valueOf(dto.getUnit()));
-    	case "LENGTH":
-    		return new QuantityModel<>(dto.getValue(),LengthUnit.valueOf(dto.getUnit()));
-    	case "TEMPERATURE":
-    		return new QuantityModel<>(dto.getValue(),Temperature.valueOf(dto.getUnit()));
-    	default:
-    		throw new IllegalArgumentException("The Unit Does Not Exists");
-    	}
-    }
-    private void  validateArithmeticOperation(QuantityModel<?> thisQuantityModel,QuantityModel<?> thatQuantityModel) {
-    	if(Double.isInfinite(thisQuantityModel.getValue())||Double.isNaN(thisQuantityModel.getValue())||Double.isInfinite(thatQuantityModel.getValue())||Double.isNaN(thatQuantityModel.getValue())) {
-    		throw new IllegalArgumentException("Invalid Value");
-    	}
-    	if(thisQuantityModel.getUnit().getClass()!=thatQuantityModel.getUnit().getClass()) {
-    		throw new IllegalArgumentException("Unit mismatch");
-    	}
-    }
 }
