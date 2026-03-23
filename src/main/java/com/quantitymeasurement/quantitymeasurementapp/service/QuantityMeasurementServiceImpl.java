@@ -1,26 +1,25 @@
 package com.quantitymeasurement.quantitymeasurementapp.service;
 
-import com.app.quantitymeasurementapp.model.QuantityDTO;
-import com.app.quantitymeasurementapp.model.QuantityMeasurementEntity;
+import java.util.List;
+import java.util.logging.Logger;
 
 import org.springframework.stereotype.Service;
 
-import com.app.quantitymeasurementapp.entity.QuantityMeasurementDTO;
-import com.app.quantitymeasurementapp.entity.QuantityModel;
-import com.app.quantitymeasurementapp.exception.CategoryMismatchException;
-import com.app.quantitymeasurementapp.exception.InvalidUnitException;
-import com.app.quantitymeasurementapp.exception.InvalidUnitMeasurementException;
-import com.app.quantitymeasurementapp.exception.QuantityMeasurementException;
-import com.app.quantitymeasurementapp.quantity.Quantity;
-import com.app.quantitymeasurementapp.repository.QuantityMeasurementRepository;
-import com.app.quantitymeasurementapp.unit.IMeasurable;
-import com.app.quantitymeasurementapp.unit.LengthUnit;
-import com.app.quantitymeasurementapp.unit.TemperatureUnit;
-import com.app.quantitymeasurementapp.unit.VolumeUnit;
-import com.app.quantitymeasurementapp.unit.WeightUnit;
-
-import java.util.List;
-import java.util.logging.*;
+import com.quantitymeasurement.quantitymeasurementapp.entity.QuantityMeasurementDTO;
+import com.quantitymeasurement.quantitymeasurementapp.entity.QuantityModel;
+import com.quantitymeasurement.quantitymeasurementapp.exception.CategoryMismatchException;
+import com.quantitymeasurement.quantitymeasurementapp.exception.InvalidUnitException;
+import com.quantitymeasurement.quantitymeasurementapp.exception.InvalidUnitMeasurementException;
+import com.quantitymeasurement.quantitymeasurementapp.exception.QuantityMeasurementException;
+import com.quantitymeasurement.quantitymeasurementapp.model.QuantityDTO;
+import com.quantitymeasurement.quantitymeasurementapp.model.QuantityMeasurementEntity;
+import com.quantitymeasurement.quantitymeasurementapp.quantity.Quantity;
+import com.quantitymeasurement.quantitymeasurementapp.repository.QuantityMeasurementRepository;
+import com.quantitymeasurement.quantitymeasurementapp.unit.IMeasurable;
+import com.quantitymeasurement.quantitymeasurementapp.unit.LengthUnit;
+import com.quantitymeasurement.quantitymeasurementapp.unit.TemperatureUnit;
+import com.quantitymeasurement.quantitymeasurementapp.unit.VolumeUnit;
+import com.quantitymeasurement.quantitymeasurementapp.unit.WeightUnit;
 @Service
 public class QuantityMeasurementServiceImpl implements IQuantityMeasurementService{
 	// Logger for logging information and errors
@@ -59,16 +58,16 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
 	    
 	    // 5. Save to Repository
 	    QuantityMeasurementEntity entity = new QuantityMeasurementEntity(
-    			thisQuantityDTO.value,
-    			thisQuantityDTO.unit,
-    			thisQuantityDTO.measurementType,
-    			thatQuantityDTO.value,
-    			thatQuantityDTO.unit,
-    			thatQuantityDTO.measurementType,
+	    		thisQuantityDTO.getValue(),
+	    		thisQuantityDTO.getUnit(),
+	    		thisQuantityDTO.getMeasurementType(),
+	    		thatQuantityDTO.getValue(),
+	    		thatQuantityDTO.getUnit(),
+	    		thatQuantityDTO.getMeasurementType(),
     			Operation.COMPARE.name(),
     			isEqual ? 1.0 : 0.0,
-    			thisQuantityDTO.unit,
-    			thisQuantityDTO.measurementType,
+    					thisQuantityDTO.getUnit(),
+    					thisQuantityDTO.getMeasurementType(),
     			"null",
     			false,
     			"null"
@@ -91,16 +90,16 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
 	    
 	    //4. save to repository
 	    QuantityMeasurementEntity entity = new QuantityMeasurementEntity(
-	    			thisQuantityDTO.value,
-	    			thisQuantityDTO.unit,
-	    			thisQuantityDTO.measurementType,
-	    			thatQuantityDTO.value,
-	    			thatQuantityDTO.unit,
-	    			thatQuantityDTO.measurementType,
+	    		thisQuantityDTO.getValue(),
+	    		thisQuantityDTO.getUnit(),
+	    		thisQuantityDTO.getMeasurementType(),
+	    		thatQuantityDTO.getValue(),
+	    		thatQuantityDTO.getUnit(),
+	    		thatQuantityDTO.getMeasurementType(),
 	    			Operation.CONVERT.name(),
 	    			value1,
-	    			thisQuantityDTO.unit,
-	    			thisQuantityDTO.measurementType,
+	    			thisQuantityDTO.getUnit(),
+	    			thisQuantityDTO.getMeasurementType(),
 	    			"null",
 	    			false,
 	    			"null"
@@ -167,7 +166,7 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
             throw new QuantityMeasurementException("Quantity data cannot be null");
         }
     		
-        String type = dto.getMeasurementType();
+        String type = dto.getMeasurementType() ;
         String unitName = dto.getUnit();
         IMeasurable unit;
         try {

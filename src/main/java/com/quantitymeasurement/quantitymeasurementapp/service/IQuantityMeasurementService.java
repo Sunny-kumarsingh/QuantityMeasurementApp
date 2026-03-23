@@ -1,9 +1,8 @@
 package com.quantitymeasurement.quantitymeasurementapp.service;
 
 import java.util.List;
-
-import com.app.quantitymeasurementapp.entity.QuantityMeasurementDTO;
-import com.app.quantitymeasurementapp.model.QuantityDTO;
+import com.quantitymeasurement.quantitymeasurementapp.entity.QuantityMeasurementDTO;
+import com.quantitymeasurement.quantitymeasurementapp.model.QuantityDTO;
 
 public interface IQuantityMeasurementService {
 	public QuantityMeasurementDTO compare(QuantityDTO thisQuantityDTO, QuantityDTO thatQuantityDTO);

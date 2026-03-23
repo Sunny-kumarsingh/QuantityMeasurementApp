@@ -52,7 +52,7 @@ public class QuantityDTO {
 		}
 	}
 
-	enum VolumneUnit implements IMeasurableUnit {
+	enum VolumeUnit implements IMeasurableUnit {
 		MILILITRE, LITRE, GALLON;
 
 		@Override
@@ -81,18 +81,18 @@ public class QuantityDTO {
 
 	@NotNull(message = "Value cannot be empty")
 	@Schema(example = "1.0")
-	public double value;
+	private double value;
 
 	@NotNull(message = "Unit cannot be null")
 	@Schema(example = "FEET", allowableValues = { "FEET", "INCHES", "YARDS", "CENTIMETERS", "LITRE", "MILLILITER",
 			"GALLON", "MILLIGRAM", "GRAM", "KILOGRAM", "POUND", "TONNE", "CELSIUS", "FAHRENHEIT" })
-	public String unit;
+	private String unit;
 
 	@NotNull(message = "Measurement type cannot be null")
 	@Pattern(regexp = "(?i)LengthUnit|VolumeUnit|WeightUnit|TemperatureUnit", message = "Measurement type must be one of: LengthUnit, VolumeUnit, "
 			+ "WeightUnit, TemperatureUnit")
 	@Schema(example = "LengthUnit", allowableValues = { "LengthUnit", "VolumeUnit", "WeightUnit", "TemperatureUnit" })
-	public String measurementType;
+	private String measurementType;
 
 	@AssertTrue(message = "Unit must be valid for the specified measurement type")
 	public boolean isValidUnit() {
@@ -103,7 +103,7 @@ public class QuantityDTO {
 				LengthUnit.valueOf(unit);
 				break;
 			case "VolumeUnit":
-				VolumneUnit.valueOf(unit);
+				VolumeUnit.valueOf(unit);
 				break;
 			case "WeightUnit":
 				WeightUnit.valueOf(unit);

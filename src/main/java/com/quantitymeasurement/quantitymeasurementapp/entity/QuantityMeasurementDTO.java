@@ -2,10 +2,8 @@ package com.quantitymeasurement.quantitymeasurementapp.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.app.quantitymeasurementapp.model.QuantityMeasurementEntity;
+import com.quantitymeasurement.quantitymeasurementapp.model.QuantityMeasurementEntity;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
