@@ -6,31 +6,55 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.quantitymeasurement.quantitymeasurementapp.exception.JwtAuthenticationEntryPoint;
+
+import lombok.AllArgsConstructor;
+
 @Configuration
 @EnableWebSecurity
+@AllArgsConstructor
 public class SecurityConfig {
+	
+	private final JwtFilter jwtFilter;
+	
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+	
+    @Bean
+    PasswordEncoder passwordEncoder() {
+	    return new BCryptPasswordEncoder();
+	}
+	
+	@Bean
+	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
-				// DISABLE CSRF - Required for REST APIs with JWT
 				.csrf(csrf -> csrf.disable()) // - THIS IS KEY!
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.exceptionHandling(exception-> exception.authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
 				.authorizeHttpRequests(authz -> authz
-						// Public endpoints
-						// All API endpoints require no authentication
-						.anyRequest().permitAll());
+						.requestMatchers("/auth/**", "/swagger-ui/**", "/h2-console/**", "/v3/api-docs/**").permitAll()
+						.anyRequest().authenticated())
+						.sessionManagement(session-> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+		
+		http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+		
 		// For H2 Console
 		http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
 		return http.build();
 	}
 
 	@Bean
-	public CorsConfigurationSource corsConfigurationSource() {
+	CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
 		configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:8080"));
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));

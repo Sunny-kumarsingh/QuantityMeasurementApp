@@ -1,4 +1,4 @@
-package com.quantitymeasurement.quantitymeasurementapp.entity;
+package com.quantitymeasurement.quantitymeasurementapp.dto;
 
 import java.util.ArrayList;
 import java.util.List;
