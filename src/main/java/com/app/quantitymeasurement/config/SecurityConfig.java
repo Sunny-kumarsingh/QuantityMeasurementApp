@@ -1,51 +1,91 @@
 package com.app.quantitymeasurement.config;
 
+import java.util.Arrays;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final JwtAuthFilter jwtAuthFilter;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
+
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
+
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // 1. Disable CSRF for JWT/Stateless APIs
             .csrf(csrf -> csrf.disable())
-
-            // 2. Configure Endpoint Permissions
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/h2-console/**").permitAll() // Keep H2 access
-                .requestMatchers("/auth/**").permitAll()       // Permit login/register
-                .anyRequest().authenticated()                  // Protect all other APIs
+                .requestMatchers(
+                    "/auth/**", 
+                    "/oauth2/**", 
+                    "/login/oauth2/**",
+                    // ✅ PUBLIC QUANTITY OPERATIONS - NO LOGIN REQUIRED
+                    "/api/quantities/**",
+                    // ✅ SWAGGER PATHS
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/v3/api-docs/**",
+                    "/v3/api-docs",
+                    "/swagger-resources/**",
+                    "/swagger-resources",
+                    "/webjars/**"
+                ).permitAll()
+                // ✅ HISTORY REQUIRES AUTHENTICATION
+                .requestMatchers("/api/history/**").authenticated()
+                .requestMatchers("/api/auth/me").authenticated()
+                .anyRequest().authenticated()
             )
-
-            // 3. Enable OAuth2 Login
-            .oauth2Login(oauth->oauth.defaultSuccessUrl("/oauth/success",true))
-
-            // 4. Handle H2 Frames (Needed to see the H2 UI in browser)
-            .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-
-            // 5. Session Management (Set to stateless if strictly using JWT)
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-            );
+            .oauth2Login(oauth -> oauth
+                .authorizationEndpoint(auth -> auth
+                    .baseUri("/oauth2/authorization")
+                )
+                .redirectionEndpoint(redir -> redir
+                    .baseUri("/login/oauth2/code/*")
+                )
+                .successHandler(oAuth2SuccessHandler)
+            )
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // BCrypt Password Encoder for Local User Auth
-   
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList(frontendUrl, "http://localhost:5173", "http://localhost:3000"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "Set-Cookie"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }

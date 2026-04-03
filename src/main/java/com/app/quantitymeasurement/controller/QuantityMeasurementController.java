@@ -1,70 +1,67 @@
 package com.app.quantitymeasurement.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
-import com.app.quantitymeasurement.dto.QuantityDTO;
-import com.app.quantitymeasurement.dto.QuantityInputDTO;
-import com.app.quantitymeasurement.service.IQuantityMeasurementService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.app.quantitymeasurement.dto.QuantityCompareRequest;
+import com.app.quantitymeasurement.dto.QuantityConvertRequest;
+import com.app.quantitymeasurement.dto.QuantityArithmeticRequest;
+import com.app.quantitymeasurement.service.QuantityService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/quantities")
+@RequestMapping("/api/quantities")
+@RequiredArgsConstructor
 public class QuantityMeasurementController {
 
-    @Autowired
-    private IQuantityMeasurementService service;
-
-    // ================= COMPARE =================
+    private final QuantityService quantityService;
 
     @PostMapping("/compare")
-    public boolean compare(@RequestBody QuantityInputDTO input) {
-
-        return service.compare(
-                input.getThisQuantityDTO(),
-                input.getThatQuantityDTO()
-        );
+    public ResponseEntity<Map<String, Object>> compare(@RequestBody QuantityCompareRequest request) {
+        Map<String, Object> result = quantityService.compare(request);
+        return ResponseEntity.ok(result);
     }
 
-    // ================= CONVERT =================
-
-    @PostMapping("/convert/{targetUnit}")
-    public QuantityDTO convert(
-            @RequestBody QuantityDTO input,
-            @PathVariable String targetUnit) {
-
-        return service.convert(input, targetUnit);
+    @PostMapping("/convert")
+    public ResponseEntity<Map<String, Object>> convert(@RequestBody QuantityConvertRequest request) {
+        Map<String, Object> result = quantityService.convert(request);
+        return ResponseEntity.ok(result);
     }
-
-    // ================= ADD =================
 
     @PostMapping("/add")
-    public QuantityDTO add(@RequestBody QuantityInputDTO input) {
-
-        return service.add(
-                input.getThisQuantityDTO(),
-                input.getThatQuantityDTO()
-        );
+    public ResponseEntity<Map<String, Object>> add(@RequestBody QuantityArithmeticRequest request) {
+        Map<String, Object> result = quantityService.add(request);
+        return ResponseEntity.ok(result);
     }
-
-    // ================= SUBTRACT =================
 
     @PostMapping("/subtract")
-    public QuantityDTO subtract(@RequestBody QuantityInputDTO input) {
-
-        return service.subtract(
-                input.getThisQuantityDTO(),
-                input.getThatQuantityDTO()
-        );
+    public ResponseEntity<Map<String, Object>> subtract(@RequestBody QuantityArithmeticRequest request) {
+        Map<String, Object> result = quantityService.subtract(request);
+        return ResponseEntity.ok(result);
     }
 
-    // ================= DIVIDE =================
+    @PostMapping("/multiply")
+    public ResponseEntity<Map<String, Object>> multiply(@RequestBody QuantityArithmeticRequest request) {
+        Map<String, Object> result = quantityService.multiply(request);
+        return ResponseEntity.ok(result);
+    }
 
     @PostMapping("/divide")
-    public double divide(@RequestBody QuantityInputDTO input) {
+    public ResponseEntity<Map<String, Object>> divide(@RequestBody QuantityArithmeticRequest request) {
+        Map<String, Object> result = quantityService.divide(request);
+        return ResponseEntity.ok(result);
+    }
 
-        return service.divide(
-                input.getThisQuantityDTO(),
-                input.getThatQuantityDTO()
-        );
+    @GetMapping("/units")
+    public ResponseEntity<Map<String, Object>> getUnits() {
+        Map<String, Object> units = quantityService.getAllUnits();
+        return ResponseEntity.ok(units);
     }
 }

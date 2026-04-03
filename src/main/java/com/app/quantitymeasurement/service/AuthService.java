@@ -1,49 +1,66 @@
 package com.app.quantitymeasurement.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Set;
+
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.app.quantitymeasurement.dto.UserRegistrationDTO;
-import com.app.quantitymeasurement.model.User;
+import com.app.quantitymeasurement.dto.LoginRequest;
+import com.app.quantitymeasurement.dto.SignupRequest;
+import com.app.quantitymeasurement.exception.UserAlreadyExistsException;
+import com.app.quantitymeasurement.exception.UserNotFoundException;
+import com.app.quantitymeasurement.exception.WrongPasswordException;
+import com.app.quantitymeasurement.model.UserEntity;
 import com.app.quantitymeasurement.repository.UserRepository;
 
-import lombok.experimental.PackagePrivate;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
-	@Autowired
-	private UserRepository repository;
-	
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-	
-	// Register User (Hash Password)
-	public User register(UserRegistrationDTO userDto) {
-		User user = new User();
-		
-		
-		user.setName(userDto.getName());
-	    user.setEmail(userDto.getEmail());
-	    user.setMobile(userDto.getMobile());
-	    
-	    // Hash the password
-	    user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-	    
-	    // Hardcode the role so a hacker can't send "ROLE_ADMIN" in JSON
-	    user.setRole("ROLE_USER"); 
-	    user.setProvider("LOCAL");
-		
-		return repository.save(user);
-	}
-	
-	// Login User (Compare hashed password)
-	public User login(String email, String password) {
-		User user = repository.findByEmail(email).orElseThrow(()-> new RuntimeException("User Not Found"));
-		
-		if(!passwordEncoder.matches(password, user.getPassword())) {
-			throw new RuntimeException("Invalid Password");
-		}
-		return user;
-	}
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+
+    public UserEntity signup(SignupRequest request) {
+        String email = request.getEmail().trim().toLowerCase();
+
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new UserAlreadyExistsException("User already exists with email: " + email);
+        }
+
+        UserEntity user = UserEntity.builder()
+                .name(request.getName())
+                .email(email)
+                .password(passwordEncoder.encode(request.getPassword()))
+                .roles(Set.of(UserEntity.Role.USER))
+                .build();
+
+        return userRepository.save(user);
+    }
+
+    public String login(LoginRequest request, HttpServletResponse response) {
+        String email = request.getEmail().trim().toLowerCase();
+
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new WrongPasswordException("Invalid password");
+        }
+
+        String token = jwtService.generateToken(user);
+
+        Cookie cookie = new Cookie("token", token);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(86400);
+        response.addCookie(cookie);
+
+        return token;
+    }
 }
