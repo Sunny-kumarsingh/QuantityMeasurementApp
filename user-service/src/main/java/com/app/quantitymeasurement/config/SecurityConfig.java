@@ -63,7 +63,11 @@ public class SecurityConfig {
                     .baseUri("/login/oauth2/code/*")
                 )
                 .successHandler(oAuth2SuccessHandler)
+                .failureHandler((request, response, exception) -> 
+                    response.sendRedirect(frontendUrl + "/?error=oauth2_failed")
+                )
             )
+            .exceptionHandling(e -> e.authenticationEntryPoint((request, response, authException) -> response.sendError(401, "Unauthorized")))
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
