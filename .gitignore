@@ -38,6 +38,8 @@ build/
 
 # Backup folder
 monolith-backup/
+application-secrets.properties
+
 
 # Misc
 *.swp
