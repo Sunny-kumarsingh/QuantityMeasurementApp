@@ -3,10 +3,8 @@ version: '3.8'
 services:
   discovery-server:
     build:
-      context: .
+      context: ./discovery-server
       dockerfile: Dockerfile
-      args:
-        MODULE: discovery-server
     ports:
       - "8761:8761"
     networks:
@@ -19,10 +17,8 @@ services:
 
   api-gateway:
     build:
-      context: .
+      context: ./api-gateway
       dockerfile: Dockerfile
-      args:
-        MODULE: api-gateway
     ports:
       - "8080:8080"
     environment:
@@ -36,10 +32,8 @@ services:
 
   user-service:
     build:
-      context: .
+      context: ./user-service
       dockerfile: Dockerfile
-      args:
-        MODULE: user-service
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
       # Overriding database credentials to point to AWS RDS via your environment variables
@@ -61,10 +55,8 @@ services:
 
   measurement-service:
     build:
-      context: .
+      context: ./measurement-service
       dockerfile: Dockerfile
-      args:
-        MODULE: measurement-service
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
       - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:mysql://localhost:3306/quantity_db}
