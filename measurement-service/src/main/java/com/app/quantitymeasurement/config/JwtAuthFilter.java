@@ -47,14 +47,23 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String token = null;
 
-        // Read from cookie
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("token".equals(cookie.getName())) {
-                    token = cookie.getValue();
-                    System.out.println("Found token in cookie for path: " + path);
-                    break;
+        // 1. First try to read from the Authorization header
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+            System.out.println("Found token in Authorization header for path: " + path);
+        }
+
+        // 2. Fallback to cookie if no header
+        if (token == null) {
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if ("token".equals(cookie.getName())) {
+                        token = cookie.getValue();
+                        System.out.println("Found token in cookie for path: " + path);
+                        break;
+                    }
                 }
             }
         }
